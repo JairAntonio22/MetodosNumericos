@@ -16,8 +16,9 @@ function mMatriz_inicial = Matriz_input(iReng, iCol)
 endfunction
 
 
-function mMatriz_resultado = GetMatrix(mMatrix, iReng, iCol)
+function [mMatriz_resultado,iPivotAnterior] = GetMatrix(mMatrix, iReng, iCol)
     iPivotAnterior = 1
+    iCont = 1
     for i = 1 : iReng
         for k = 1 : iReng
             if (i ~= k) then
@@ -29,32 +30,45 @@ function mMatriz_resultado = GetMatrix(mMatrix, iReng, iCol)
             end
         end
         iPivotAnterior = mMatrix(i,i)
+        disp("Usted esta en la iteracion " + string(iCont) + "!!!")
+        iCont = iCont + 1
         disp(mMatrix)
     end
 
     for i = 1 : (iReng - 1)
         mMatrix(i,i) = iPivotAnterior 
     end
-
+    
+    disp("Ultima iteracion")
     disp(mMatrix)
 
-    for i = 1 : iReng
-        X(i) = mMatrix(i,iCol) / iPivotAnterior
-    end
-
-    disp(X)
+    mMatriz_resultado = mMatrix
 
 endfunction
 
 
-function DisplayMatrix(mMatriz)
+//donde el prefijo a significa arreglo
+function aResultado = DisplayMatrix(mMatriz,iPivote,iReng,iCol)
+    for i = 1 : iReng
+       aResultado(i) = mMatriz(i,iCol) / iPivote 
+    end
+    
+    disp("El vector resultado de su matriz es: ")
+    disp(aResultado)
+    disp("zaz")
 endfunction
 
 
 
 //Main
-
-[iReng, iCol] = PidoValores()
-mMatriz_inicial = Matriz_input(iReng,iCol)
-disp(GetMatrix(mMatriz_inicial,iReng,iCol))
-
+iUserResp = 1
+while (iUserResp ~= 0) 
+    [iReng, iCol] = PidoValores()
+    mMatriz_inicial = Matriz_input(iReng,iCol)
+    disp("Su matriz original es: ")
+    disp(mMatriz_inicial)
+    disp("Procedemos a calcularla")
+    [mMatriz_Result,iPivote] = GetMatrix(mMatriz_inicial,iReng,iCol)
+    DisplayMatrix(mMatriz_Result,iPivote,iReng,iCol)
+    iUserResp = int(input("Si no desea realizar otra matriz teclee 0: "))
+end
