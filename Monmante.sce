@@ -1,44 +1,59 @@
-<<<<<<< HEAD
 clear
 
 
-function GetMatrix()
+function [iRenglones,iColumnas] = PidoValores()
+    iRenglones = int(input("Cuantos renglones quieres que tenga la matriz?: "))
+    iColumnas = int(input("Cuantas columnas quieres que tenga la matriz:? "))
+endfunction
+
+function mMatriz_inicial = Matriz_input(iReng, iCol)
+    for i = 1 : iReng
+        for j = 1 : iCol
+            mMatriz_inicial(i,j) = int(input("Da el elemento [" ...
+            +  string(i)+ "," + string(j) + "]"))
+        end
+    end
 endfunction
 
 
-function DisplayMatrix()
+function mMatriz_resultado = GetMatrix(mMatrix, iReng, iCol)
+    iPivotAnterior = 1
+    for i = 1 : iReng
+        for k = 1 : iReng
+            if (i ~= k) then
+                for j = i + 1 : iCol
+                    mMatrix(k,j) = (mMatrix(i,i) * mMatrix(k,j) ...
+                    - mMatrix(k,i) * mMatrix(i,j)) / PivoteAnterior
+                end
+                mMatrix(k,i) = 0         
+            end
+        end
+        PivoteAnterior = mMatrix(i,i)
+        disp(mMatrix)
+    end
+
+    for i = 1 : (iReng - 1)
+        mMatrix(i,i) = PivoteAnterior 
+    end
+
+    disp(mMatrix)
+
+    for i = 1 : iReng
+        X(i) = mMatrix(i,iCol) / pivoteAnterior
+    end
+
+    disp(X)
+
 endfunction
 
-/*
-1.     PivoteAnterior = 1
-2.     Para cada renglon i desde 1 hasta numero de renglones
 
-<Pivoteo i>
+function DisplayMatrix(mMatriz)
+endfunction
 
-2.1    Para cada renglon k desde 1 hasta el numero de renglones
 
-2.1.1   Si k es diferente a la i
 
-2.1.1.1  Para cada columna j desde i + 1 hasta numero de columnas
+//Main
 
-2.1.1.1.1  M(k,j) = ( M(i,i) * M(k,j) - M(k,i) * M(i,j)) / PivoteAnterior
-
-                            2.1.1.2   M(k,i) = 0
-
-         2.2    PivoteAnterior = M(i,i)
-
-         2.3    Despliega M
-
-3. Para cada renglon i desde 1 hasta Renglones -1
-
-     M(i, i) = PivoteAnterior
-
-4. Despliega M
-
-5. Para cada renglon i desde 1 hasta Renlones
-
-     X(i) = m(i,columnas) / pivoteAnterior
-
-6.  Despliega X
->>>>>>> 13936208eddaee2454f3ebcdac5df7a5e9d7c4f0
-*/
+[iReng, iCol] = PidoValores()
+mMatriz_inicial = Matriz_input(iReng,iCol)
+disp(mMatriz_inicial)
