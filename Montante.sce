@@ -29,8 +29,8 @@ clear
 //      iColumnas
 /////////////////////////////////////////////////////
 function [iRenglones,iColumnas] = PidoValores()
-    iRenglones = -1;
-    iColumnas = -1;
+    iRenglones = -1
+    iColumnas = -1
     
     // Pide y valida valores de renglon y columna
     while (iRenglones <= 0)
@@ -55,9 +55,9 @@ endfunction
 //      iReng       Renglones de la matriz
 //      iCol
 //
-//    Regresa: matMatrizInicial
+//    Regresa: mMatrix
 /////////////////////////////////////////////////////
-function mMatrix = MatrizInput(iReng, iCol)
+function mMatrix = MatrixInput(iReng, iCol)
     // Iteración sobre la matriz para inicializar valores
     for i = 1 : iReng
         for j = 1 : iCol
@@ -148,49 +148,48 @@ endfunction
 //    Imprime los resultados de la matriz
 //    
 //    Parametros:
-//      matMatriz
-//      iPivote
-//      iReng
-//      iCol
+//      MAT 
 //   Regresa:
-//      arrResultado
+//      Ningun Valor
 /////////////////////////////////////////////////////
-function DisplayResult(mMatrix)
-    // Extrae vector con solución al sistema de ecuaciones
-    for i = 1 : size(mMatrix, 1)
-       vResultado(i) = mMatrix(i, iCol)
+function DisplayMatrix(MAT)
+    [r, c] = size(MAT)
+    for i = 1 : r
+        sLinea = ""
+        for j = 1 : c
+            if j == c
+                sLinea = sLinea + string(MAT(i,j)) 
+            else
+                sLinea = sLinea + string(MAT(i,j)) + " , "
+            end
+        end
+        disp(sLinea)
     end
-    
-    // Imprime resultados en pantalla
-    disp("El vector resultado de su matriz es: ")
-    disp(vResultado)
-    disp("zaz")
-    
 endfunction
 
 
 
 // Main
-iUserResp = 1
+sUser = " " 
 
-while (iUserResp ~= 0)
+while (sUser <> "n" & sUser <> "N")
     // Pide renglon y columna de matriz
     [iReng, iCol] = PidoValores()
     
     // Inicializa matriz
-    mMatrix = MatrizInput(iReng,iCol)
+    mMatrix = MatrixInput(iReng,iCol)
     
     // Imprime matriz de entrada
     disp("Matriz original: ")
-    disp(mMatrix)
+    DisplayMatrix(mMatrix)
     
     // Resuelve sistema de ecuaciones
     disp("Procedemos a calcularla")
-    mMatrix = Resolver(mMatrix)
+    mMatrixResultado = Resolver(mMatrix)
     
     // Imprime resultados
-    DisplayResult(mMatrix)
+    DisplayMatrix(mMatrixResultado)
     
     // Pregunta si se desea volver a ejecutar el programa
-    iUserResp = int(input("Si no desea realizar otra matriz teclee 0: "))
+    sUser = input("Si no desea realizar otra matriz teclee N: ",'string')
 end
