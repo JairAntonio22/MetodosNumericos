@@ -1,5 +1,7 @@
 clear
-//Jair acuerdate de nombrarlo como Montante_1.sce
+
+
+
 ///////////////////////////////////////////////////////
 //    Montante_1.sce
 //
