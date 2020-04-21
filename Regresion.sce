@@ -326,7 +326,7 @@ endfunction
 sUser = " " 
 while (sUser <> "n" & sUser <> "N")
    // Pide renglon y columna de matriz
-    mMat = PedirValores()
+    mDatos = PedirValores()
     
     // Regresion lineal
     mMatriz = MatrizLineal(mDatos)
