@@ -1,4 +1,7 @@
 clear
+
+
+
 ///////////////////////////////////////////////////////
 //    Regresión_1.sce
 //
@@ -31,10 +34,10 @@ function mMat = PedirValores()
         n = input("Introduce los valores a procesar: ")
     end
     for i = 1 : n
-        mMat(1, i) = input("Introduce un valor en x: ") + "[" + string(i) ...
-        + "]"
-        mMat(2, i) = input("Introduce un valor en y: ") + "[" + string(i) ...
-        + "]"
+        mMat(1, i) = input("Introduce un valor en x en [" + string(i) ...
+        + "]: ")
+        mMat(2, i) = input("Introduce un valor en y en [" + string(i) ...
+        + "]: ")
     end
     
 endfunction
@@ -357,6 +360,6 @@ while (sUser <> "n" & sUser <> "N")
     disp("y = " + string(exp(mResultado(1, 3))) + " * x ^ "...
         + string(mResultado(2, 3)))
     
-    sUser = input("Desea continuar? ", "string") 
+    sUser = input("Desea continuar? de no ser asi pulse n: ", "string") 
     
 end    
