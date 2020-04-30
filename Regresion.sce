@@ -11,7 +11,7 @@ clear
 //
 //    Bernardo Salazar & Jair Antonio
 //
-//    16 / Abril  / 2020    version 1.0
+//    23 / Abril  / 2020    version 1.0
 //////////////////////////////////////////////////////
 
 
@@ -30,14 +30,14 @@ clear
 /////////////////////////////////////////////////////
 function mMat = PedirValores()
     n = 0
+    
     while n <= 0 
         n = input("Introduce los valores a procesar: ")
     end
+    
     for i = 1 : n
-        mMat(1, i) = input("Introduce un valor en x en [" + string(i) ...
-        + "]: ")
-        mMat(2, i) = input("Introduce un valor en y en [" + string(i) ...
-        + "]: ")
+        mMat(1, i) = input("Introduce un valor en x en [" + string(i) + "]: ")
+        mMat(2, i) = input("Introduce un valor en y en [" + string(i) + "]: ")
     end
     
 endfunction
@@ -56,7 +56,7 @@ endfunction
 //    Regresa:
 //      mMatriz
 /////////////////////////////////////////////////////
-function mMatriz = MatrizLineal(mDatos)
+function [vCoefs, dR2] = RegresionLineal(mDatos)
     // Obtenemos las columnas
     iNumDatos = size(mDatos, 2)
     
@@ -80,6 +80,35 @@ function mMatriz = MatrizLineal(mDatos)
     // Se pasa el valor de suma de x a otro espacio que tambien lo usa
     mMatriz(2, 1) = mMatriz(1, 2)
     
+    // Se resuelve la matriz
+    mMatriz = ResolverGaussJordan(mMatriz)
+    
+    // Se guarda el vector con los coeficientes de la regresion
+    vCoefs(1) = mMatriz(1, 3)
+    vCoefs(2) = mMatriz(2, 3)
+    
+    dPromedio = 0
+    
+    // Se calcula las ys con gorros
+    for i = 1 : iNumDatos
+        vYconGorro(i) = vCoefs(1) + vCoefs(2)*mDatos(1, i)
+        dPromedio = dPromedio + mDatos(2, i)
+    end
+    
+    dPromedio = dPromedio / iNumDatos
+    
+    // Variables para guardar las sumatorias de calculo de r2
+    dNumerador = 0
+    dDenominador = 0
+    
+    // Realiza las sumatorias para el calculo de la r2
+    for i = 1 : iNumDatos
+        dNumerador = dNumerador + (vYconGorro(i) - dPromedio)^2
+        dDenominador = dDenominador + (mDatos(2, i) - dPromedio)^2
+    end
+    
+    dR2 = dNumerador / dDenominador
+    
 endfunction
 
 
@@ -96,7 +125,7 @@ endfunction
 //    Regresa:
 //      mMatriz
 /////////////////////////////////////////////////////
-function mMatriz = MatrizCuadratica(mDatos)
+function [vCoefs, dR2] = RegresionCuadratica(mDatos)
     // Obtenemos las columnas
     iNumDatos = size(mDatos, 2)
     
@@ -132,7 +161,37 @@ function mMatriz = MatrizCuadratica(mDatos)
     
     // Se pasa el valor de suma de x^3 a otro espacio que tambien lo usa
     mMatriz(3, 2) = mMatriz(2, 3) 
-
+    
+    // Se resuelve la matriz
+    mMatriz = ResolverMontante(mMatriz)
+    
+    // Se guarda el vector con los coeficientes de la regresion
+    vCoefs(1) = mMatriz(1, 4)
+    vCoefs(2) = mMatriz(2, 4)
+    vCoefs(3) = mMatriz(3, 4)
+    
+    dPromedio = 0
+    
+    // Se calcula las ys con gorros
+    for i = 1 : iNumDatos
+        vYconGorro(i) = vCoefs(1) + vCoefs(2)*mDatos(1, i) + vCoefs(3)*(mDatos(1, i)^2)
+        dPromedio = dPromedio + mDatos(2, i)
+    end
+    
+    dPromedio = dPromedio / iNumDatos
+    
+    // Variables para guardar las sumatorias de calculo de r2
+    dNumerador = 0
+    dDenominador = 0
+    
+    // Realiza las sumatorias para el calculo de la r2
+    for i = 1 : iNumDatos
+        dNumerador = dNumerador + (vYconGorro(i) - dPromedio)^2
+        dDenominador = dDenominador + (mDatos(2, i) - dPromedio)^2
+    end
+    
+    dR2 = dNumerador / dDenominador
+    
 endfunction
 
 
@@ -149,7 +208,7 @@ endfunction
 //    Regresa:
 //      mMatriz
 /////////////////////////////////////////////////////
-function mMatriz = MatrizExponencial(mDatos)
+function [vCoefs, dR2] = RegresionExponencial(mDatos)
     // Obtenemos las columnas
     iNumDatos = size(mDatos, 2)
     
@@ -172,6 +231,35 @@ function mMatriz = MatrizExponencial(mDatos)
     
     // Se pasa el valor de suma de x a otro espacio que tambien lo usa
     mMatriz(2, 1) = mMatriz(1, 2) 
+    
+    // Se resuelve la matriz
+    mMatriz = ResolverGaussJordan(mMatriz)
+    
+    // Se guarda el vector con los coeficientes de la regresion
+    vCoefs(1) = exp(mMatriz(1, 3))
+    vCoefs(2) = mMatriz(2, 3)
+    
+    dPromedioLog = 0
+    
+    // Se calcula las ys con gorros
+    for i = 1 : iNumDatos
+        vYconGorro(i) = vCoefs(1)*exp(vCoefs(2)*mDatos(1, i))
+        dPromedioLog = dPromedioLog + log(mDatos(2, i))
+    end
+    
+    dPromedioLog = dPromedioLog / iNumDatos
+    
+    // Variables para guardar las sumatorias de calculo de r2
+    dNumerador = 0
+    dDenominador = 0
+    
+    // Realiza las sumatorias para el calculo de la r2
+    for i = 1 : iNumDatos
+        dNumerador = dNumerador + (log(mDatos(2, i)) - log(vYconGorro(i)))^2
+        dDenominador = dDenominador + (log(mDatos(2, i)) - dPromedioLog)^2
+    end
+    
+    dR2 = 1 - dNumerador / dDenominador
 
 endfunction
 
@@ -189,7 +277,7 @@ endfunction
 //    Regresa:
 //      mMatriz
 /////////////////////////////////////////////////////
-function mMatriz = MatrizPotencia(mDatos)
+function [vCoefs, dR2] = RegresionPotencia(mDatos)
     // Obtenemos las columnas
     iNumDatos = size(mDatos, 2)
     
@@ -212,6 +300,35 @@ function mMatriz = MatrizPotencia(mDatos)
     
     // Se pasa el valor de suma de x a otro espacio que tambien lo usa
     mMatriz(2, 1) = mMatriz(1, 2)
+    
+    // Se resuelve la matriz
+    mMatriz = ResolverMontante(mMatriz)
+    
+    // Se guarda el vector con los coeficientes de la regresion
+    vCoefs(1) = exp(mMatriz(1, 3))
+    vCoefs(2) = mMatriz(2, 3)
+    
+    dPromedioLog = 0
+    
+    // Se calcula las ys con gorros
+    for i = 1 : iNumDatos
+        vYconGorro(i) = vCoefs(1)*mDatos(1, i)^vCoefs(2)
+        dPromedioLog = dPromedioLog + log(mDatos(2, i))
+    end
+    
+    dPromedioLog = dPromedioLog / iNumDatos
+    
+    // Variables para guardar las sumatorias de calculo de r2
+    dNumerador = 0
+    dDenominador = 0
+    
+    // Realiza las sumatorias para el calculo de la r2
+    for i = 1 : iNumDatos
+        dNumerador = dNumerador + (log(mDatos(2, i)) - log(vYconGorro(i)))^2
+        dDenominador = dDenominador + (log(mDatos(2, i)) - dPromedioLog)^2
+    end
+    
+    dR2 = 1 - dNumerador / dDenominador
     
 endfunction
 
@@ -324,42 +441,38 @@ endfunction
 
 // Main
 sUser = " " 
+
 while (sUser <> "n" & sUser <> "N")
    // Pide renglon y columna de matriz
     mDatos = PedirValores()
     
     // Regresion lineal
-    mMatriz = MatrizLineal(mDatos)
-    mResultado = ResolverGaussJordan(mMatriz)
+    [vCoefsLineales, dR2Lineal] = RegresionLineal(mDatos)
+    disp(string(vCoefsLineales(1)) + " " + string(vCoefsLineales(2)) ...
+        + " " + string(dR2Lineal))
     
-    // Desplegamos la ecuacion de regresion lineal
-    disp("y = " + string(mResultado(1, 3)) + " + "...
-        + string(mResultado(2, 3)) + " * x")
     
     // Regresion cuadratica
-    mMatriz = MatrizCuadratica(mDatos)
-    mResultado = ResolverMontante(mMatriz)
+    [vCoefsCuadraticos, dR2Cuadratico] = RegresionCuadratica(mDatos)
+    disp(string(vCoefsCuadraticos(1)) + " " + string(vCoefsCuadraticos(2)) ...
+        + " " + string(vCoefsCuadraticos(3)) + " " + string(dR2Cuadratico))
     
-    // Desplegamos la ecuacion de regresion cuadratica
-    disp("y = " + string(mResultado(1, 4)) + " + "...
-        + string(mResultado(2, 4)) + " * x " + string(mResultado(3, 4)) + " * x^2")
     
     // Regresion exponencial
-    mMatriz = MatrizExponencial(mDatos)
-    mResultado = ResolverGaussJordan(mMatriz)
+    [vCoefsExponenciales, dR2Exponencial] = RegresionExponencial(mDatos)
+    disp(string(vCoefsExponenciales(1)) + " " + string(vCoefsExponenciales(2)) ...
+        + " " + string(dR2Exponencial))
     
-    // Desplegamos la ecuacion de regresion exponencial
-    disp("y = " + string(exp(mResultado(1, 3))) + " * e ^ "...
-        + string(mResultado(2, 3)) + " * x")
     
     // Regresion potencia
-    mMatriz = MatrizPotencia(mDatos)
-    mResultado = ResolverMontante(mMatriz)
+    [vCoefsPotencia, dR2Potencia] = RegresionPotencia(mDatos)
+    disp(string(vCoefsPotencia(1)) + " " + string(vCoefsPotencia(2)) ...
+        + " " + string(dR2Potencia))
     
-    // Desplegamos la ecuacion de regresion potencia
-    disp("y = " + string(exp(mResultado(1, 3))) + " * x ^ "...
-        + string(mResultado(2, 3)))
-    
+    /*
     sUser = input("Desea continuar? de no ser asi pulse n: ", "string") 
+    */
+    
+    sUser = " " 
     
 end    
