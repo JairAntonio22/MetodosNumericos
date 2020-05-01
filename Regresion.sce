@@ -21,14 +21,16 @@ clear
 //
 //    Es una funcion que pide los datos para hacer la
 //    regresion primero en general y luego especifica
-//    las abscisas y ordenadas.
+//    las abscisas y ordenadas. Además pide un valor a 
+//    evaluar en el mejor modelo
 //
 //    Parametros: Ningun valor
 //
 //    Regresa:
 //      mMat
+//      dValorEvaluar
 /////////////////////////////////////////////////////
-function mMat = PedirValores()
+function [mMat, dValorEvaluar] = PedirValores()
     n = 0
     
     while n <= 0 
@@ -40,21 +42,23 @@ function mMat = PedirValores()
         mMat(2, i) = input("Introduce un valor en y en [" + string(i) + "]: ")
     end
     
+    dValorEvaluar = input("Para que valor desea estimar x ? ")
+    
 endfunction
 
 
 
 ////////////////////////////////////////////////////////
-//    MatrizLineal
+//    RegresionLineal
 //
-//    Es una funcion que obtiene la matriz con la cual
-//    se va a obtener la ecuacion de regresion 
-//    lineal utilizando la matriz proporcionada.
+//    Es una funcion que calcula los coefiecientes de
+//    la regresion lineal y tambien calcula su r^2
 //
 //    Parametros: mDatos
 //
 //    Regresa:
-//      mMatriz
+//      vCoefs
+//      dR2
 /////////////////////////////////////////////////////
 function [vCoefs, dR2] = RegresionLineal(mDatos)
     // Obtenemos las columnas
@@ -113,16 +117,16 @@ endfunction
 
 
 ////////////////////////////////////////////////////////
-//    MatrizCuadratica
+//    RegresionCuadratico
 //
-//    Es una funcion que obtiene la matriz con la cual
-//    se va a obtener la ecuacion de regresion 
-//    cuadratica utilizando la matriz proporcionada.
+//    Es una funcion que calcula los coefiecientes de
+//    la regresion cuadratica y tambien calcula su r^2
 //
 //    Parametros: mDatos
 //
 //    Regresa:
-//      mMatriz
+//      vCoefs
+//      dR2
 /////////////////////////////////////////////////////
 function [vCoefs, dR2] = RegresionCuadratica(mDatos)
     // Obtenemos las columnas
@@ -194,16 +198,16 @@ endfunction
 
 
 ////////////////////////////////////////////////////////
-//    MatrizExponencial
+//    RegresionExponencial
 //
-//    Es una funcion que obtiene la matriz con la cual
-//    se va a obtener la ecuacion de regresion 
-//    exponencial utilizando la matriz proporcionada.
+//    Es una funcion que calcula los coefiecientes de
+//    la regresion exponencial y tambien calcula su r^2
 //
 //    Parametros: mDatos
 //
 //    Regresa:
-//      mMatriz
+//      vCoefs
+//      dR2
 /////////////////////////////////////////////////////
 function [vCoefs, dR2] = RegresionExponencial(mDatos)
     // Obtenemos las columnas
@@ -263,16 +267,16 @@ endfunction
 
 
 ////////////////////////////////////////////////////////
-//    MatrizPotencia
+//    RegresionPotencial
 //
-//    Es una funcion que obtiene la matriz con la cual
-//    se va a obtener la ecuacion de regresion 
-//    potencia utilizando la matriz proporcionada.
+//    Es una funcion que calcula los coefiecientes de
+//    la regresion potencial y tambien calcula su r^2
 //
 //    Parametros: mDatos
 //
 //    Regresa:
-//      mMatriz
+//      vCoefs
+//      dR2
 /////////////////////////////////////////////////////
 function [vCoefs, dR2] = RegresionPotencia(mDatos)
     // Obtenemos las columnas
@@ -442,8 +446,10 @@ endfunction
 sUser = " " 
 
 while (sUser <> "n" & sUser <> "N")
-   // Pide renglon y columna de matriz
-    mDatos = PedirValores()
+    disp("******************************************************")
+    
+    // Pide renglon y columna de matriz
+    [mDatos, dValorEvaluar] = PedirValores()
     
     // Regresion lineal
     [vCoefsL, dR2L] = RegresionLineal(mDatos)
@@ -464,36 +470,65 @@ while (sUser <> "n" & sUser <> "N")
     // Reporte de resultados
     disp("I) Modelos:")
     
-    disp("    Lineal      : y = " + string(vCoefsL(1)) + " + " + ...
+    disp("    Lineal: y = " + string(vCoefsL(1)) + " + " + ...
         string(vCoefsL(2)) + " * x")
     disp("         R^2 =" + string(dR2L))
     
-    disp("    Cuadratica  : y = " + string(vCoefsC(1)) + " + " + ...
+    disp("    Cuadratica: y = " + string(vCoefsC(1)) + " + " + ...
         string(vCoefsC(2)) + " * x + " +  string(vCoefsC(3)) + " * x^2")
     disp("         R^2 =" + string(dR2C))
         
-    disp("    Exponencial : y = " + string(vCoefsE(1)) + " * e ^ (" + ...
+    disp("    Exponencial: y = " + string(vCoefsE(1)) + " * e ^ (" + ...
         string(vCoefsE(2)) + " * x)")
     disp("         R^2 =" + string(dR2E))
     
-    disp("    Potencial   : y = " + string(vCoefsP(1)) + " *  x ^ (" + ...
+    disp("    Potencial: y = " + string(vCoefsP(1)) + " *  x ^ (" + ...
         string(vCoefsP(2)) + ")")
     disp("         R^2 =" + string(dR2P))
     
     // Seleccion del mejor modelo
-    maxIndex = max(vRs2, 2)
-    
     disp("II) Conclusiones:")
     
-    select maxIndex
+    // Elige el la maoyr R^2
+    [value, index] = max(vRs2)
+    
+    select index
     case 1 then
-        disp()
-        case 2 then
-        case 3 then
-        case 4 then
+        disp("El mejor modelo sera el lineal")
+        
+        dEval = vCoefsL(1) + vCoefsL(2)*dValorEvaluar
+        
+        disp("Si x = " + string(dValorEvaluar) + " entonces y = " ...
+            + string(dEval))
+        
+    case 2 then
+        disp("El mejor modelo sera el cuadratico")
+        
+        dEval = vCoefsC(1) + vCoefCs(2)*dEval + vCoefsC(3)*dValorEvaluar^2
+        
+        disp("Si x = " + string(dValorEvaluar) + " entonces y = " ...
+            + string(dEval))
+        
+    case 3 then
+        disp("El mejor modelo sera el exponencial")
+        
+        dEval = vCoefsE(1)*exp(vCoefsE(2)*dValorEvaluar)
+        
+        disp("Si x = " + string(dValorEvaluar) + " entonces y = " ...
+            + string(dEval))
+            
+    case 4 then
+        disp("El mejor modelo sera el potencial")
+        
+        dEval = vCoefsP(1)*dValorEvaluar^vCoefsP(2)
+        
+        disp("Si x = " + string(dValorEvaluar) + " entonces y = " ...
+            + string(dEval))
     end
     
-    
+    // Pide respuesta para continuar el programa
     sUser = input("Desea continuar? de no ser asi pulse n: ", "string")
     
 end    
+
+
