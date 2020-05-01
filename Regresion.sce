@@ -3,7 +3,7 @@ clear
 
 
 ///////////////////////////////////////////////////////
-//    Regresión_1.sce
+//    Regresion_1.sce
 //
 //    Este programa obtiene las ecuaciones de regresiones
 //    del tipo lineal, cuadratica, exponencial y potencial
@@ -11,7 +11,7 @@ clear
 //
 //    Bernardo Salazar & Jair Antonio
 //
-//    23 / Abril  / 2020    version 1.0
+//    30 / Abril  / 2020    version 1.0
 //////////////////////////////////////////////////////
 
 
@@ -446,8 +446,6 @@ endfunction
 sUser = " " 
 
 while (sUser <> "n" & sUser <> "N")
-    disp("******************************************************")
-    
     // Pide renglon y columna de matriz
     [mDatos, dValorEvaluar] = PedirValores()
     
