@@ -234,7 +234,7 @@ function [vCoefs, dR2] = RegresionExponencial(mDatos)
     mMatriz(2, 1) = mMatriz(1, 2) 
     
     // Se resuelve la matriz
-    mMatriz = ResolverGaussJordan(mMatriz)
+    mMatriz = ResolverMontante(mMatriz)
     
     // Se guarda el vector con los coeficientes de la regresion
     vCoefs = mMatriz(:,3)
@@ -303,7 +303,7 @@ function [vCoefs, dR2] = RegresionPotencia(mDatos)
     mMatriz(2, 1) = mMatriz(1, 2)
     
     // Se resuelve la matriz
-    mMatriz = ResolverMontante(mMatriz)
+    mMatriz = ResolverGaussJordan(mMatriz)
     
     // Se guarda el vector con los coeficientes de la regresion
     vCoefs = mMatriz(:,3)
@@ -525,6 +525,36 @@ while (sUser <> "n" & sUser <> "N")
         disp("Si x = " + string(dValorEvaluar) + " entonces y = " ...
             + string(dEval))
     end
+    
+    disp("III Grafica")
+    //Graficas 
+    clf(); //Eliminas la cuadricula
+    iCol = size(mDatos,2)
+    iDominio = [mDatos(1,1)-0.4:0.2:mDatos(1,iCol)+0.5]';
+    
+    //Pone la cuadricula a la grafica
+    xgrid()
+    
+    //Grafica de puntos
+    iXPuntos = mDatos(1,:)
+    iYPuntos = mDatos(2,:)
+    plot(iXPuntos,iYPuntos,'xk') // cruz negra
+    
+    //Funciones a graficar
+    vFuncionLineal = vCoefsL(1) + (vCoefsL(2)* iDominio)
+    vFuncionCuadratica = vCoefsC(1) + (vCoefsC(2)*iDominio) + (vCoefsC(3)*(iDominio^2))
+    vFuncionExponencial = vCoefsE(1) * exp(vCoefsE(2) * iDominio)
+    vFuncionPotencia = vCoefsP(1) * iDominio ^ vCoefsP(2)
+
+    //Grafica de funciones
+    plot(iDominio,vFuncionLineal,'r') // rojo
+    plot(iDominio,vFuncionCuadratica,'g') // verde
+    plot(iDominio,vFuncionExponencial,'b') // azul
+    plot(iDominio,vFuncionPotencia,'m') // magenta
+
+    //Leyenda de la grafica
+    // pos = 4 posiciona la leyenda en la esquina inferior derecha
+    legend(['Datos','Lineal','Cuadratica','Exponencial','Potencia'],pos=4)
     
     // Pide respuesta para continuar el programa
     sUser = input("Desea continuar? de no ser asi pulse n: ", "string")
