@@ -84,8 +84,7 @@ function [vCoefs, dR2] = RegresionLineal(mDatos)
     mMatriz = ResolverGaussJordan(mMatriz)
     
     // Se guarda el vector con los coeficientes de la regresion
-    vCoefs(1) = mMatriz(1, 3)
-    vCoefs(2) = mMatriz(2, 3)
+    vCoefs = mMatriz(:,3)
     
     dPromedio = 0
     
@@ -166,9 +165,7 @@ function [vCoefs, dR2] = RegresionCuadratica(mDatos)
     mMatriz = ResolverMontante(mMatriz)
     
     // Se guarda el vector con los coeficientes de la regresion
-    vCoefs(1) = mMatriz(1, 4)
-    vCoefs(2) = mMatriz(2, 4)
-    vCoefs(3) = mMatriz(3, 4)
+    vCoefs = mMatriz(:,4)
     
     dPromedio = 0
     
@@ -236,8 +233,8 @@ function [vCoefs, dR2] = RegresionExponencial(mDatos)
     mMatriz = ResolverGaussJordan(mMatriz)
     
     // Se guarda el vector con los coeficientes de la regresion
-    vCoefs(1) = exp(mMatriz(1, 3))
-    vCoefs(2) = mMatriz(2, 3)
+    vCoefs = mMatriz(:,3)
+    vCoefs(1) = exp(vCoefs(1))
     
     dPromedioLog = 0
     
@@ -305,8 +302,8 @@ function [vCoefs, dR2] = RegresionPotencia(mDatos)
     mMatriz = ResolverMontante(mMatriz)
     
     // Se guarda el vector con los coeficientes de la regresion
-    vCoefs(1) = exp(mMatriz(1, 3))
-    vCoefs(2) = mMatriz(2, 3)
+    vCoefs = mMatriz(:,3)
+    vCoefs(1) = exp(vCoefs(1))
     
     dPromedioLog = 0
     
