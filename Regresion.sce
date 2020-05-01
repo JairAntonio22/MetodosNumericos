@@ -436,6 +436,8 @@ function mResultado = ResolverGaussJordan(mMatrix)
     
 endfunction
 
+
+
 // Main
 sUser = " " 
 
@@ -444,32 +446,54 @@ while (sUser <> "n" & sUser <> "N")
     mDatos = PedirValores()
     
     // Regresion lineal
-    [vCoefsLineales, dR2Lineal] = RegresionLineal(mDatos)
-    disp(string(vCoefsLineales(1)) + " " + string(vCoefsLineales(2)) ...
-        + " " + string(dR2Lineal))
-    
+    [vCoefsL, dR2L] = RegresionLineal(mDatos)
+    vRs2(1) = dR2L
     
     // Regresion cuadratica
-    [vCoefsCuadraticos, dR2Cuadratico] = RegresionCuadratica(mDatos)
-    disp(string(vCoefsCuadraticos(1)) + " " + string(vCoefsCuadraticos(2)) ...
-        + " " + string(vCoefsCuadraticos(3)) + " " + string(dR2Cuadratico))
-    
+    [vCoefsC, dR2C] = RegresionCuadratica(mDatos)
+    vRs2(2) = dR2C
     
     // Regresion exponencial
-    [vCoefsExponenciales, dR2Exponencial] = RegresionExponencial(mDatos)
-    disp(string(vCoefsExponenciales(1)) + " " + string(vCoefsExponenciales(2)) ...
-        + " " + string(dR2Exponencial))
-    
+    [vCoefsE, dR2E] = RegresionExponencial(mDatos)
+    vRs2(3) = dR2E
     
     // Regresion potencia
-    [vCoefsPotencia, dR2Potencia] = RegresionPotencia(mDatos)
-    disp(string(vCoefsPotencia(1)) + " " + string(vCoefsPotencia(2)) ...
-        + " " + string(dR2Potencia))
+    [vCoefsP, dR2P] = RegresionPotencia(mDatos)
+    vRs2(4) = dR2P
     
-    /*
-    sUser = input("Desea continuar? de no ser asi pulse n: ", "string") 
-    */
+    // Reporte de resultados
+    disp("I) Modelos:")
     
-    sUser = " " 
+    disp("    Lineal      : y = " + string(vCoefsL(1)) + " + " + ...
+        string(vCoefsL(2)) + " * x")
+    disp("         R^2 =" + string(dR2L))
+    
+    disp("    Cuadratica  : y = " + string(vCoefsC(1)) + " + " + ...
+        string(vCoefsC(2)) + " * x + " +  string(vCoefsC(3)) + " * x^2")
+    disp("         R^2 =" + string(dR2C))
+        
+    disp("    Exponencial : y = " + string(vCoefsE(1)) + " * e ^ (" + ...
+        string(vCoefsE(2)) + " * x)")
+    disp("         R^2 =" + string(dR2E))
+    
+    disp("    Potencial   : y = " + string(vCoefsP(1)) + " *  x ^ (" + ...
+        string(vCoefsP(2)) + ")")
+    disp("         R^2 =" + string(dR2P))
+    
+    // Seleccion del mejor modelo
+    maxIndex = max(vRs2, 2)
+    
+    disp("II) Conclusiones:")
+    
+    select maxIndex
+    case 1 then
+        disp()
+        case 2 then
+        case 3 then
+        case 4 then
+    end
+    
+    
+    sUser = input("Desea continuar? de no ser asi pulse n: ", "string")
     
 end    
