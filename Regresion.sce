@@ -502,7 +502,7 @@ while (sUser <> "n" & sUser <> "N")
     case 2 then
         disp("El mejor modelo sera el cuadratico")
         
-        dEval = vCoefsC(1) + vCoefCs(2)*dEval + vCoefsC(3)*dValorEvaluar^2
+        dEval = vCoefsC(1) + vCoefsC(2)*dValorEvaluar + vCoefsC(3)*dValorEvaluar^2
         
         disp("Si x = " + string(dValorEvaluar) + " entonces y = " ...
             + string(dEval))
@@ -524,7 +524,7 @@ while (sUser <> "n" & sUser <> "N")
             + string(dEval))
     end
     
-    disp("III Grafica")
+    disp("III Graficas")
     //Graficas 
     clf(); //Eliminas la cuadricula
     iCol = size(mDatos,2)
