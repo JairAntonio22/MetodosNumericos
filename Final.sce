@@ -1,5 +1,7 @@
 clear
 
+
+
 //////////////////////////////////////////////////////
 //    crearMatriz
 //    
@@ -10,14 +12,13 @@ clear
 //    
 //    Regresa: matriz resultante
 /////////////////////////////////////////////////////
-
-function iCrearMatriz = getValores()
+function mCrearMatriz = getValores()
     //lee el archivo de Excel
-    dHoja = readxls('TrabajoFinal.xls')
+    fHoja = readxls('TrabajoFinal.xls')
     //lee la hoja donde está la matriz
-    dHoja2 = dHoja(2)
+    fHoja2 = fHoja(2)
     //extraer los valores
-    iCrearMatriz = dHoja2(:,:)    
+    mCrearMatriz = fHoja2(:,:)    
 endfunction
 
 
@@ -37,52 +38,16 @@ function dResultado = ValorMedio(vDatos)
     dEsperado = 0
     dTotal = 0
     
-    for i = 1 : size(datos)
+    for i = 1 : size(vDatos,1)
         // Suma de terminos para valor esperado
-        dEsperado = dEsperado + i*datos(i)/dTotal
+        dEsperado = dEsperado + i*vDatos(i,1)
         
         //Suma de valores 
-        dTotal = dTotal + size(i)
+        dTotal = dTotal + vDatos(i,1)
     end
     
     // Se asigna el resultado al cociente del valor esperado entre el total
     dResultado = dEsperado/dTotal
-    
-endfunction
-
-
-
-//////////////////////////////////////////////////////
-//    InterpolacionLagrange
-//    
-//    Dado un vector de datos y una x, encuentra el valor
-//    x evaluado en un polinomio de Lagrange
-//    
-//    Parametros: vDatos, dX
-//    
-//    Regresa: dResultado
-/////////////////////////////////////////////////////
-function dResultado = InterpolacionLagrange(vDatos, dX)
-    // Se inicializa la sumatoria de terminos
-    dSuma = 0
-    
-    // Ciclo que lleva el control de la suma de terminos
-    for j = 1 : size(datos)
-        dTermino = datos(i)
-        
-        // Ciclo que lleva el calculo de los terminos individuales
-        for m = 1 : size(datos)
-            if (m <> j) then
-                // Acumulacion de terminos del producto
-                dTermino = dTermino*(dX - m)/(j - m)
-            end
-        end
-        
-        // Acumulacion de terminos de la sumatoria
-        dSuma = dSuma + dTermino
-    end
-    
-    dResultado = dSuma
     
 endfunction
 
@@ -436,10 +401,128 @@ function [vCoefs, dR2] = RegresionPotencia(mDatos)
 endfunction
 
 
+mMatriz = getValores()
+disp(mMatriz)
 
+for i = 1 : size(mMatriz,2)
+    vVector = flipdim(mMatriz(:,i),dim=1)
+    dValorMedio = ValorMedio(vVector)
+    mDatos(1,i) = i
+    mDatos(2,i) = dValorMedio
+end
+
+// Regresion lineal
+[vCoefsL, dR2L] = RegresionLineal(mDatos)
+vRs2(1) = dR2L
+
+// Regresion cuadratica
+[vCoefsC, dR2C] = RegresionCuadratica(mDatos)
+vRs2(2) = dR2C
+
+// Regresion exponencial
+[vCoefsE, dR2E] = RegresionExponencial(mDatos)
+vRs2(3) = dR2E
+
+// Regresion potencia
+[vCoefsP, dR2P] = RegresionPotencia(mDatos)
+vRs2(4) = dR2P
+
+// Reporte de resultados
+disp("I) Modelos:")
+
+disp("    Lineal: y = " + string(vCoefsL(1)) + " + " + ...
+        string(vCoefsL(2)) + " * x")
+disp("         R^2 =" + string(dR2L))
+
+disp("    Cuadratica: y = " + string(vCoefsC(1)) + " + " + ...
+        string(vCoefsC(2)) + " * x + " +  string(vCoefsC(3)) + " * x^2")
+disp("         R^2 =" + string(dR2C))
+
+disp("    Exponencial: y = " + string(vCoefsE(1)) + " * e ^ (" + ...
+        string(vCoefsE(2)) + " * x)")
+disp("         R^2 =" + string(dR2E))
+
+disp("    Potencial: y = " + string(vCoefsP(1)) + " *  x ^ (" + ...
+        string(vCoefsP(2)) + ")")
+disp("         R^2 =" + string(dR2P))
+
+//Graficas 
+clf(); //Eliminas la grafica previa en memoria
+xtitle();
+iCol = size(mMatriz,2) 
+iReng = size(mMatriz,1)  
+iDominio = linspace(1,iCol,15)
+//Pone la cuadricula a la grafica
+xgrid(303030,0.5,7)
+
+//Grafica de puntos
+iXPuntos = mDatos(1,:)
+iYPuntos = mDatos(2,:)
+plot(iXPuntos,iYPuntos,'or') // circulo negro
+
+
+// Imprimir sensores
+for i = 1 : iCol 
+    for j = 1 : iReng
+        plot(i,j,'*b') // asterisco azul 
+    end
+end
+
+// Elige el la mayor R^2
+[value, index] = max(vRs2)
+
+replot([0,0,iCol+1,iReng+1])
+select index
+case 1 then
+    disp("El mejor modelo sera el lineal")
+    vFuncionLineal = vCoefsL(1) + (vCoefsL(2)* iDominio)
+    plot(iDominio,vFuncionLineal,'r') // rojo
+    legend(['Datos','Lineal'],pos=4)
+case 2 then
+    disp("El mejor modelo sera el cuadratico")
+    vFuncionCuadratica = vCoefsC(1) + (vCoefsC(2)*iDominio) + ...
+    (vCoefsC(3)*(iDominio^2))
+    plot(iDominio,vFuncionCuadratica,'r') // rojo
+    legend(['Puntos de calor';'Sensores';'vFuncionCuadratica'],pos=4)
+case 3 then
+    disp("El mejor modelo sera el exponencial")
+    vFuncionExponencial = vCoefsE(1) * exp(vCoefsE(2) * iDominio)
+    replot([0,0,iReng,iCol])
+    plot(iDominio,vFuncionExponencial,'b')
+    legend(['Datos','Exponencial'],pos=4)
+case 4 then
+    disp("El mejor modelo sera el potencial")
+    vFuncionPotencia = vCoefsP(1) * iDominio ^ vCoefsP(2)
+    replot([0,0,iReng,iCol])
+    plot(iDominio,vFuncionPotencia,'r')
+    legend(['Datos','Potencia'],pos=4)
+end
+
+disp("III Graficas")
+
+//Funciones a graficar
+
+
+
+
+
+//Grafica de funciones
+
+
+
+
+//Leyenda de la grafica
+// pos = 4 posiciona la leyenda en la esquina inferior derecha
+
+
+
+
+/*
 // Main
 sUser = " " 
 
 while (sUser <> "n" & sUser <> "N")
-    
+        
 end    
+*/
+
