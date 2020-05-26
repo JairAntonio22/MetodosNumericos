@@ -1,5 +1,24 @@
 clear
 
+//////////////////////////////////////////////////////
+//    crearMatriz
+//    
+//    Dado un archivo de Excel, se lee la matriz a Scilab
+//    para su manejo
+//    
+//    Parametros: archivo de Excel
+//    
+//    Regresa: matriz resultante
+/////////////////////////////////////////////////////
+
+function iCrearMatriz = getValores()
+    //lee el archivo de Excel
+    dHoja = readxls('TrabajoFinal.xls')
+    //lee la hoja donde está la matriz
+    dHoja2 = dHoja(2)
+    //extraer los valores
+    iCrearMatriz = dHoja2(:,:)    
+endfunction
 
 
 //////////////////////////////////////////////////////
