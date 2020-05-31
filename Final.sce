@@ -13,12 +13,12 @@ clear
 //    Regresa: matriz resultante
 /////////////////////////////////////////////////////
 function mCrearMatriz = getValores()
-    //lee el archivo de Excel
-    fHoja = readxls('TrabajoFinal.xls')
+    //lee el archivo de Excel (libro)
+    fLibro = readxls('Trabajofinal.xls')
     //lee la hoja donde está la matriz
-    fHoja2 = fHoja(2)
+    fHoja = fLibro(3)
     //extraer los valores
-    mCrearMatriz = fHoja2(:,:)    
+    mCrearMatriz = fHoja(:,:)    
 endfunction
 
 
@@ -33,24 +33,40 @@ endfunction
 //    
 //    Regresa: dResultado
 /////////////////////////////////////////////////////
-function dResultado = ValorMedio(vDatos)
+function [dResultado,bBandera] = ValorMedio(vDatos)
     // Se incializan variables para calculo del valor esperado
     dEsperado = 0
     dTotal = 0
     
+    dValor = vDatos(1)
+    for j = 2 : size(vDatos,1)
+        if (dValor ~= vDatos(j)) then
+            dValor = vDatos(j)
+            break
+        end
+    end
+    
+    bBandera = %T
+    if (dValor == vDatos(1)) then
+        bBandera = %F
+    end
+    
     for i = 1 : size(vDatos,1)
         // Suma de terminos para valor esperado
-        dEsperado = dEsperado + i*vDatos(i,1)
+        dEsperado = dEsperado + i*vDatos(i)
         
         //Suma de valores 
-        dTotal = dTotal + vDatos(i,1)
+        dTotal = dTotal + vDatos(i)
+        
+        if (vDatos(i) < 0)then
+            bBandera = %F
+            break
+        end
     end
     
     // Se asigna el resultado al cociente del valor esperado entre el total
     dResultado = dEsperado/dTotal
-    
 endfunction
-
 
 
 //////////////////////////////////////////////////////
@@ -400,104 +416,118 @@ function [vCoefs, dR2] = RegresionPotencia(mDatos)
     
 endfunction
 
+//////////////////////////
 
 
-// Main
+//main
+
+////////////////////////////
 sUser = " " 
 while (sUser <> "n" & sUser <> "N")
     mMatriz = getValores()
+    disp(mMatriz)
+    iIndice = 1 
     for i = 1 : size(mMatriz,2)
         vVector = flipdim(mMatriz(:,i),dim=1)
-        dValorMedio = ValorMedio(vVector)
-        mDatos(1,i) = i
-        mDatos(2,i) = dValorMedio
+        disp(vVector)
+        [dValorMedio,bBandera] = ValorMedio(vVector)
+        if (bBandera)then
+            mDatos(1,iIndice) = i
+            mDatos(2,iIndice) = dValorMedio
+            iIndice = iIndice + 1
+        end  
+        
     end
-
-    // Regresion lineal
-    [vCoefsL, dR2L] = RegresionLineal(mDatos)
-    vRs2(1) = dR2L
-
-    // Regresion cuadratica
-    [vCoefsC, dR2C] = RegresionCuadratica(mDatos)
-    vRs2(2) = dR2C
-
-    // Regresion exponencial
-    [vCoefsE, dR2E] = RegresionExponencial(mDatos)
-    vRs2(3) = dR2E
-
-    // Regresion potencia
-    [vCoefsP, dR2P] = RegresionPotencia(mDatos)
-    vRs2(4) = dR2P
-
-    // Reporte de resultados
-    disp("I) Modelos:")
-
-    disp("    Lineal: y = " + string(vCoefsL(1)) + " + " + ...
-        string(vCoefsL(2)) + " * x")
-    disp("         R^2 =" + string(dR2L))
-
-    disp("    Cuadratica: y = " + string(vCoefsC(1)) + " + " + ...
-        string(vCoefsC(2)) + " * x + " +  string(vCoefsC(3)) + " * x^2")
-    disp("         R^2 =" + string(dR2C))
-
-    disp("    Exponencial: y = " + string(vCoefsE(1)) + " * e ^ (" + ...
-        string(vCoefsE(2)) + " * x)")
-    disp("         R^2 =" + string(dR2E))
-
-    disp("    Potencial: y = " + string(vCoefsP(1)) + " *  x ^ (" + ...
-        string(vCoefsP(2)) + ")")
-    disp("         R^2 =" + string(dR2P))
-
-    //Graficas 
-    clf(); //Eliminas la grafica previa en memoria
-    xtitle("Estimacion de comportamiento del calor");
-    xname("Proyecto Final Metodos Numericos");
-    iCol = size(mMatriz,2) 
-    iReng = size(mMatriz,1)  
-    iDominio = linspace(1,iCol,15)
-    //Pone la cuadricula a la grafica
-    xgrid(303030,0.5,7)
-
-    //Grafica de puntos
-    iXPuntos = mDatos(1,:)
-    iYPuntos = mDatos(2,:)
-    plot(iXPuntos,iYPuntos,'or') // circulo negro
-
-    // Imprimir sensores
-    for i = 1 : iCol 
-        for j = 1 : iReng
-            plot(i,j,'*b') // asterisco azul 
+    if (size(mDatos,2) ~= 0) then
+        // Regresion lineal
+        [vCoefsL, dR2L] = RegresionLineal(mDatos)
+        vRs2(1) = dR2L
+    
+        // Regresion cuadratica
+        [vCoefsC, dR2C] = RegresionCuadratica(mDatos)
+        vRs2(2) = dR2C
+    
+        // Regresion exponencial
+        [vCoefsE, dR2E] = RegresionExponencial(mDatos)
+        vRs2(3) = dR2E
+    
+        // Regresion potencia
+        [vCoefsP, dR2P] = RegresionPotencia(mDatos)
+        vRs2(4) = dR2P
+    
+        // Reporte de resultados
+        disp("I) Modelos:")
+    
+        disp("    Lineal: y = " + string(vCoefsL(1)) + " + " + ...
+            string(vCoefsL(2)) + " * x")
+        disp("         R^2 =" + string(dR2L))
+    
+        disp("    Cuadratica: y = " + string(vCoefsC(1)) + " + " + ...
+            string(vCoefsC(2)) + " * x + " +  string(vCoefsC(3)) + " * x^2")
+        disp("         R^2 =" + string(dR2C))
+    
+        disp("    Exponencial: y = " + string(vCoefsE(1)) + " * e ^ (" + ...
+            string(vCoefsE(2)) + " * x)")
+        disp("         R^2 =" + string(dR2E))
+    
+        disp("    Potencial: y = " + string(vCoefsP(1)) + " *  x ^ (" + ...
+            string(vCoefsP(2)) + ")")
+        disp("         R^2 =" + string(dR2P))
+    
+        //Graficas 
+        clf(); //Eliminas la grafica previa en memoria
+        xtitle("Estimacion de comportamiento del calor");
+        xname("Proyecto Final Metodos Numericos");
+        iCol = size(mMatriz,2) 
+        iReng = size(mMatriz,1)  
+        iDominio = linspace(1,iCol,15)
+        //Pone la cuadricula a la grafica
+        xgrid(303030,0.5,7)
+    
+        //Grafica de puntos
+        iXPuntos = mDatos(1,:)
+        iYPuntos = mDatos(2,:)
+        plot(iXPuntos,iYPuntos,'or') // circulo negro
+    
+        // Imprimir sensores
+        for i = 1 : iCol 
+            for j = 1 : iReng
+                plot(i,j,'*b') // asterisco azul 
+            end
         end
-    end
-
-    // Elige el la mayor R^2
-    [value, index] = max(vRs2)
-
-    replot([0,0,iCol+1,iReng+1])
-    select index
-    case 1 then
-        disp("El mejor modelo sera el lineal")
-        vFuncionLineal = vCoefsL(1) + (vCoefsL(2)* iDominio)
-        plot(iDominio,vFuncionLineal,'r') // rojo
-        legend(['Puntos de calor';'Sensores'],pos = 4)
-    case 2 then
-        disp("El mejor modelo sera el cuadratico")
-        vFuncionCuadratica = vCoefsC(1) + (vCoefsC(2)*iDominio) + ...
-        (vCoefsC(3)*(iDominio^2))
-        plot(iDominio,vFuncionCuadratica,'r') // rojo
-        legend(['Puntos de calor';'Sensores'],pos = 4)
-    case 3 then
-        disp("El mejor modelo sera el exponencial")
-        vFuncionExponencial = vCoefsE(1) * exp(vCoefsE(2) * iDominio)
-        plot(iDominio,vFuncionExponencial,'b')
-        legend(['Puntos de calor';'Sensores'],pos = 4)
-    case 4 then
-        disp("El mejor modelo sera el potencial")
-        vFuncionPotencia = vCoefsP(1) * iDominio ^ vCoefsP(2)
-        plot(iDominio,vFuncionPotencia,'r')
-        legend(['Puntos de calor';'Sensores'],pos = 4)
+    
+        // Elige el la mayor R^2
+        [value, index] = max(vRs2)
+    
+        replot([0,0,iCol+1,iReng+1])
+        select index
+        case 1 then
+            disp("El mejor modelo sera el lineal")
+            vFuncionLineal = vCoefsL(1) + (vCoefsL(2)* iDominio)
+            plot(iDominio,vFuncionLineal,'r') // rojo
+            legend(['Puntos de calor';'Sensores'],pos = 4)
+        case 2 then
+            disp("El mejor modelo sera el cuadratico")
+            vFuncionCuadratica = vCoefsC(1) + (vCoefsC(2)*iDominio) + ...
+            (vCoefsC(3)*(iDominio^2))
+            plot(iDominio,vFuncionCuadratica,'r') // rojo
+            legend(['Puntos de calor';'Sensores'],pos = 4)
+        case 3 then
+            disp("El mejor modelo sera el exponencial")
+            vFuncionExponencial = vCoefsE(1) * exp(vCoefsE(2) * iDominio)
+            plot(iDominio,vFuncionExponencial,'b')
+            legend(['Puntos de calor';'Sensores'],pos = 4)
+        case 4 then
+            disp("El mejor modelo sera el potencial")
+            vFuncionPotencia = vCoefsP(1) * iDominio ^ vCoefsP(2)
+            plot(iDominio,vFuncionPotencia,'r')
+            legend(['Puntos de calor';'Sensores'],pos = 4)
+        end
+    else
+        disp("Datos no Validos!!!")
     end
     
     sUser = input("Si no desea realizar otra lectura de calor teclee N: ",'string')
 end    
 
+           
