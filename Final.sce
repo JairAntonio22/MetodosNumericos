@@ -3,20 +3,38 @@ clear
 
 
 //////////////////////////////////////////////////////
-//    crearMatriz
+//    getValores
 //    
 //    Dado un archivo de Excel, se lee la matriz a Scilab
 //    para su manejo
 //    
-//    Parametros: archivo de Excel
+//    Parametros: Ninguno
 //    
-//    Regresa: matriz resultante
+//    Regresa: mCrearMatriz
 /////////////////////////////////////////////////////
 function mCrearMatriz = getValores()
-    //lee el archivo de Excel (libro)
-    fLibro = readxls('Trabajofinal.xls')
+    //Probar que el archivo se lea
+    bCiclo = %T
+    while bCiclo do
+        try
+            sNombre = input("Introduzca el nombre del archivo (con extension xls): ",'string') 
+            //lee el archivo de Excel (libro)
+            fLibro = readxls(sNombre+".xls")
+              
+            bCiclo = %F
+        catch
+            disp("Error archivo no encontrado!")
+            bCiclo = %T
+        end
+    end
+    
+    iHoja = -1
+    while (iHoja <= 0)
+        iHoja = input("Introduzca la hoja de su excel: ")    
+    end
+    
     //lee la hoja donde está la matriz
-    fHoja = fLibro(3)
+    fHoja = fLibro(iHoja)
     //extraer los valores
     mCrearMatriz = fHoja(:,:)    
 endfunction
@@ -67,6 +85,7 @@ function [dResultado,bBandera] = ValorMedio(vDatos)
     // Se asigna el resultado al cociente del valor esperado entre el total
     dResultado = dEsperado/dTotal
 endfunction
+
 
 
 //////////////////////////////////////////////////////
@@ -126,7 +145,6 @@ function mResultado = ResolverMontante(mMatrix)
     
     // Regresa matriz
     mResultado = mMatrix
-    
 endfunction
 
 
@@ -194,7 +212,6 @@ function [vCoefs, dR2] = RegresionLineal(mDatos)
     end
     
     dR2 = dNumerador / dDenominador
-    
 endfunction
 
 
@@ -275,7 +292,6 @@ function [vCoefs, dR2] = RegresionCuadratica(mDatos)
     end
     
     dR2 = dNumerador / dDenominador
-    
 endfunction
 
 
@@ -344,7 +360,6 @@ function [vCoefs, dR2] = RegresionExponencial(mDatos)
     end
     
     dR2 = 1 - dNumerador / dDenominador
-
 endfunction
 
 
@@ -413,15 +428,15 @@ function [vCoefs, dR2] = RegresionPotencia(mDatos)
     end
     
     dR2 = 1 - dNumerador / dDenominador
-    
 endfunction
 
-//////////////////////////
 
 
-//main
-
-////////////////////////////
+////////////////////////////////////////////////////////
+//    
+//    Main
+//    
+/////////////////////////////////////////////////////
 sUser = " " 
 while (sUser <> "n" & sUser <> "N")
     mMatriz = getValores()
@@ -529,5 +544,3 @@ while (sUser <> "n" & sUser <> "N")
     
     sUser = input("Si no desea realizar otra lectura de calor teclee N: ",'string')
 end    
-
-           
