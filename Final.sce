@@ -5,8 +5,8 @@ clear
 //////////////////////////////////////////////////////
 //    getValores
 //    
-//    Dado un archivo de Excel, se lee la matriz a Scilab
-//    para su manejo
+//    Dado un archivo de Excel, se lee la matriz a 
+//    Scilab para su manejo
 //    
 //    Parametros: Ninguno
 //    
@@ -28,15 +28,58 @@ function mCrearMatriz = getValores()
         end
     end
     
-    iHoja = -1
-    while (iHoja <= 0)
-        iHoja = input("Introduzca la hoja de su excel: ")    
+    bCiclo = %T
+    while bCiclo do
+        try
+            //Pide el numero de la hoja
+            iHoja = input("Introduzca la hoja de su excel: ")
+            //lee la hoja donde esta la matriz 
+            fHoja = fLibro(iHoja)
+            bCiclo = %F
+        catch
+            disp("Error hoja no encontrada!")
+            bCiclo = %T
+        end
     end
     
-    //lee la hoja donde está la matriz
-    fHoja = fLibro(iHoja)
     //extraer los valores
     mCrearMatriz = fHoja(:,:)    
+endfunction
+
+
+
+//////////////////////////////////////////////////////
+//    ValidarVector
+//    
+//    Valida el vector de entrada, si este tiene 
+//    valores identicos o algun valor negativo
+//    
+//    Parametros: vDatos
+//    
+//    Regresa: bValido
+/////////////////////////////////////////////////////
+function bValido = ValidarVector(vDatos)
+    dValor = vDatos(1)
+    bValido = %T
+    bEsNegativo = %F
+    bValoresIdenticos = %F
+    for j = 1 : size(vDatos,1)
+        if (dValor ~= vDatos(j)) then
+            dValor = vDatos(j)
+            break
+        end
+        
+        if (vDatos(j) < 0) then
+            bEsNegativo = %T
+            break
+        end
+    end
+    
+    if (dValor == vDatos(1)) then
+        bValoresIdenticos = %T
+    end
+    
+    bValido = ~(bEsNegativo || bValoresIdenticos)
 endfunction
 
 
@@ -51,23 +94,10 @@ endfunction
 //    
 //    Regresa: dResultado
 /////////////////////////////////////////////////////
-function [dResultado,bBandera] = ValorMedio(vDatos)
+function dResultado = ValorMedio(vDatos)
     // Se incializan variables para calculo del valor esperado
     dEsperado = 0
     dTotal = 0
-    
-    dValor = vDatos(1)
-    for j = 2 : size(vDatos,1)
-        if (dValor ~= vDatos(j)) then
-            dValor = vDatos(j)
-            break
-        end
-    end
-    
-    bBandera = %T
-    if (dValor == vDatos(1)) then
-        bBandera = %F
-    end
     
     for i = 1 : size(vDatos,1)
         // Suma de terminos para valor esperado
@@ -75,11 +105,6 @@ function [dResultado,bBandera] = ValorMedio(vDatos)
         
         //Suma de valores 
         dTotal = dTotal + vDatos(i)
-        
-        if (vDatos(i) < 0)then
-            bBandera = %F
-            break
-        end
     end
     
     // Se asigna el resultado al cociente del valor esperado entre el total
@@ -440,20 +465,20 @@ endfunction
 sUser = " " 
 while (sUser <> "n" & sUser <> "N")
     mMatriz = getValores()
-    disp(mMatriz)
     iIndice = 1 
+    bEjecutar = %F
     for i = 1 : size(mMatriz,2)
         vVector = flipdim(mMatriz(:,i),dim=1)
-        disp(vVector)
-        [dValorMedio,bBandera] = ValorMedio(vVector)
+        bBandera = ValidarVector(vVector)
         if (bBandera)then
             mDatos(1,iIndice) = i
-            mDatos(2,iIndice) = dValorMedio
+            mDatos(2,iIndice) = ValorMedio(vVector)
             iIndice = iIndice + 1
+            bEjecutar = %T
         end  
-        
+  
     end
-    if (size(mDatos,2) ~= 0) then
+    if (bEjecutar) then
         // Regresion lineal
         [vCoefsL, dR2L] = RegresionLineal(mDatos)
         vRs2(1) = dR2L
@@ -502,7 +527,7 @@ while (sUser <> "n" & sUser <> "N")
         //Grafica de puntos
         iXPuntos = mDatos(1,:)
         iYPuntos = mDatos(2,:)
-        plot(iXPuntos,iYPuntos,'or') // circulo negro
+        plot(iXPuntos,iYPuntos,'or') // circulo rojo
     
         // Imprimir sensores
         for i = 1 : iCol 
